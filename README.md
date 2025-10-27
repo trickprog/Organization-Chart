@@ -1,4 +1,4 @@
-# HR Organization Chart - Clean
+# HR Organization Chart
 
 A modern, interactive HR organization chart application built with React and Vite. This application provides a clean and professional interface for visualizing company organizational structures with employee search and filtering capabilities.
 
@@ -131,7 +131,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 MIT License
 
-Copyright (c) 2024
+Copyright (c) 2025
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
