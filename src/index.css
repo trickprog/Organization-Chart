@@ -1,0 +1,98 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  }
+}
+
+@layer components {
+  .org-node-container {
+    @apply relative;
+  }
+
+  .org-chart-container {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    min-height: 100vh;
+  }
+
+  .org-chart-content {
+    @apply relative w-full;
+  }
+
+  /* Connection lines */
+  .connection-line {
+    @apply bg-gray-300;
+    transition: all 0.3s ease;
+  }
+
+  /* Custom scrollbar for org chart */
+  .org-chart-container::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .org-chart-container::-webkit-scrollbar-track {
+    @apply bg-gray-200 rounded;
+  }
+
+  .org-chart-container::-webkit-scrollbar-thumb {
+    @apply bg-gray-400 rounded;
+  }
+
+  .org-chart-container::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-500;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 640px) {
+    .org-chart-container {
+      @apply p-4;
+    }
+    
+    .employee-card {
+      @apply w-full max-w-xs;
+    }
+  }
+
+  @media (min-width: 641px) and (max-width: 1024px) {
+    .employee-card {
+      @apply max-w-sm;
+    }
+  }
+
+  /* Animation for expand/collapse */
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+  .animate-slide-down {
+    animation: slideDown 0.3s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      max-height: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      max-height: 500px;
+      transform: translateY(0);
+    }
+  }
+}
