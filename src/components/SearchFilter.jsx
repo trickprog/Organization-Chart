@@ -21,7 +21,8 @@ const SearchFilter = ({
   searchResults,
   isSearchActive,
   onEmployeeClick,
-  onNavigateToEmployee
+  onNavigateToEmployee,
+  onMobileClose
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilters, setSelectedFilters] = useState({
@@ -266,18 +267,30 @@ const SearchFilter = ({
   }
 
   return (
-    <div className="h-full w-80 bg-white border-r border-gray-200 flex flex-col shadow-xl">
+    <div className="h-full w-[85vw] sm:w-80 bg-white border-r border-gray-200 flex flex-col shadow-xl">
       {/* Header */}
       <div className="p-4 border-b border-gray-100">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-900">Search</h2>
-          <button
-            onClick={() => setIsCollapsed(true)}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            title="Collapse sidebar"
-          >
-            <PanelLeftClose className="w-5 h-5 text-gray-500" />
-          </button>
+          <div className="flex items-center gap-2">
+            {/* Mobile close button */}
+            {onMobileClose && (
+              <button
+                onClick={onMobileClose}
+                className="md:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                title="Close sidebar"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            )}
+            <button
+              onClick={() => setIsCollapsed(true)}
+              className="hidden md:block p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              title="Collapse sidebar"
+            >
+              <PanelLeftClose className="w-5 h-5 text-gray-500" />
+            </button>
+          </div>
         </div>
 
         {/* Search Input */}

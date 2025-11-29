@@ -39,7 +39,7 @@ const ProfessionalOrgChart = forwardRef(({
   const nodeRefs = useRef({});
 
   // Use pan canvas hook
-  const { isPanning, panOffset, handleMouseDown, resetView } = usePanCanvas(canvasRef);
+  const { isPanning, panOffset, handleMouseDown, handleTouchStart, resetView } = usePanCanvas(canvasRef);
 
   // Build hierarchy from employees
   const hierarchy = buildHierarchy(employees);
@@ -344,7 +344,7 @@ const ProfessionalOrgChart = forwardRef(({
     return (
       <div className={wrapperClasses}>
         <div
-          className={`bg-white rounded-2xl border transition-all duration-200 cursor-pointer w-72 mx-auto ${getCardClasses()}`}
+          className={`bg-white rounded-2xl border transition-all duration-200 cursor-pointer w-52 sm:w-64 md:w-72 mx-auto ${getCardClasses()}`}
           onClick={() => onEmployeeClick && onEmployeeClick(employee)}
         >
           {(isTarget || isInPath) && (
@@ -408,7 +408,7 @@ const ProfessionalOrgChart = forwardRef(({
               )}
             </div>
 
-            <div className="space-y-1.5 text-xs text-gray-500 mb-3">
+            <div className="space-y-1.5 text-xs text-gray-500 mb-3 hidden sm:block">
               <div className="flex items-center gap-2">
                 <Mail className="w-3 h-3 text-gray-400" />
                 <span className="truncate">{employee.email}</span>
@@ -522,6 +522,7 @@ const ProfessionalOrgChart = forwardRef(({
         canvasRef={canvasRef}
         chartContainerRef={chartContainerRef}
         onMouseDown={handleMouseDown}
+        onTouchStart={handleTouchStart}
         isPanning={isPanning}
         panOffset={panOffset}
         hasActiveHighlight={hasActiveHighlight}
