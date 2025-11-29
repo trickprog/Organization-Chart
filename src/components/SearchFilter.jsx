@@ -1,22 +1,27 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Search, 
-  Filter, 
-  X, 
-  Users, 
-  MapPin, 
-  Mail,
-  Award,
+import {
+  Search,
+  SlidersHorizontal,
+  X,
+  Building2,
+  MapPin,
+  Sparkles,
   ChevronDown,
-  Zap
+  Check,
+  ChevronRight,
+  Users,
+  PanelLeftClose,
+  PanelLeft
 } from 'lucide-react';
 
-const SearchFilter = ({ 
-  employees, 
-  onSearchResults, 
+const SearchFilter = ({
+  employees,
+  onSearchResults,
   onClearSearch,
   searchResults,
-  isSearchActive 
+  isSearchActive,
+  onEmployeeClick,
+  onNavigateToEmployee
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilters, setSelectedFilters] = useState({
@@ -24,13 +29,14 @@ const SearchFilter = ({
     locations: [],
     skills: []
   });
-  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
   const [showDropdowns, setShowDropdowns] = useState({
     departments: false,
     locations: false,
     skills: false
   });
-  
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
   const searchInputRef = useRef(null);
 
   // Extract unique values for filter options
@@ -38,7 +44,7 @@ const SearchFilter = ({
     const departments = [...new Set(employees.map(emp => emp.department))];
     const locations = [...new Set(employees.map(emp => emp.location))];
     const skills = [...new Set(employees.flatMap(emp => emp.skills || []))];
-    
+
     return { departments, locations, skills };
   };
 
@@ -46,36 +52,32 @@ const SearchFilter = ({
 
   // Perform search and filtering
   const performSearch = () => {
-    if (!searchQuery.trim() && selectedFilters.departments.length === 0 && 
-        selectedFilters.locations.length === 0 && selectedFilters.skills.length === 0) {
+    if (!searchQuery.trim() && selectedFilters.departments.length === 0 &&
+      selectedFilters.locations.length === 0 && selectedFilters.skills.length === 0) {
       onClearSearch();
       return;
     }
 
     const query = searchQuery.toLowerCase().trim();
     const matches = employees.filter(employee => {
-      // Text search across multiple fields
-      const textMatch = !query || 
+      const textMatch = !query ||
         employee.name.toLowerCase().includes(query) ||
         employee.title.toLowerCase().includes(query) ||
         employee.department.toLowerCase().includes(query) ||
         employee.email.toLowerCase().includes(query) ||
         employee.location.toLowerCase().includes(query) ||
-        (employee.skills && employee.skills.some(skill => 
+        (employee.skills && employee.skills.some(skill =>
           skill.toLowerCase().includes(query)
         ));
 
-      // Department filter
       const departmentMatch = selectedFilters.departments.length === 0 ||
         selectedFilters.departments.includes(employee.department);
 
-      // Location filter
       const locationMatch = selectedFilters.locations.length === 0 ||
         selectedFilters.locations.includes(employee.location);
 
-      // Skills filter
       const skillsMatch = selectedFilters.skills.length === 0 ||
-        selectedFilters.skills.some(skill => 
+        selectedFilters.skills.some(skill =>
           employee.skills && employee.skills.includes(skill)
         );
 
@@ -85,12 +87,10 @@ const SearchFilter = ({
     onSearchResults(matches, query);
   };
 
-  // Handle search input change
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
   };
 
-  // Handle filter toggle
   const toggleFilter = (filterType, value) => {
     setSelectedFilters(prev => ({
       ...prev,
@@ -100,7 +100,6 @@ const SearchFilter = ({
     }));
   };
 
-  // Clear all filters and search
   const clearAll = () => {
     setSearchQuery('');
     setSelectedFilters({
@@ -111,15 +110,15 @@ const SearchFilter = ({
     onClearSearch();
   };
 
-  // Toggle dropdown visibility
   const toggleDropdown = (dropdown) => {
     setShowDropdowns(prev => ({
-      ...prev,
+      departments: false,
+      locations: false,
+      skills: false,
       [dropdown]: !prev[dropdown]
     }));
   };
 
-  // Close all dropdowns
   const closeAllDropdowns = () => {
     setShowDropdowns({
       departments: false,
@@ -128,7 +127,6 @@ const SearchFilter = ({
     });
   };
 
-  // Effect to perform search when query or filters change
   useEffect(() => {
     const debounceTimer = setTimeout(() => {
       performSearch();
@@ -137,7 +135,6 @@ const SearchFilter = ({
     return () => clearTimeout(debounceTimer);
   }, [searchQuery, selectedFilters]);
 
-  // Handle clicks outside dropdowns
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (!event.target.closest('.filter-dropdown')) {
@@ -149,203 +146,344 @@ const SearchFilter = ({
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
-  // Get active filter count
   const getActiveFilterCount = () => {
-    return selectedFilters.departments.length + 
-           selectedFilters.locations.length + 
-           selectedFilters.skills.length;
+    return selectedFilters.departments.length +
+      selectedFilters.locations.length +
+      selectedFilters.skills.length;
+  };
+
+  const getDepartmentColor = (department) => {
+    const colors = {
+      'Executive': 'bg-blue-50 text-blue-700',
+      'Technology': 'bg-emerald-50 text-emerald-700',
+      'Human Resources': 'bg-violet-50 text-violet-700',
+      'Finance': 'bg-amber-50 text-amber-700',
+      'Marketing': 'bg-rose-50 text-rose-700',
+      'Sales': 'bg-cyan-50 text-cyan-700'
+    };
+    return colors[department] || 'bg-gray-50 text-gray-700';
+  };
+
+  const getInitials = (name) => {
+    return name.split(' ').map(n => n[0]).join('').toUpperCase();
   };
 
   const FilterDropdown = ({ title, items, selectedItems, filterType, icon: Icon }) => (
     <div className="filter-dropdown relative">
       <button
         onClick={() => toggleDropdown(filterType)}
-        className={`flex items-center gap-2 px-3 py-2 border rounded-lg hover:bg-gray-50 transition-colors ${
-          selectedItems.length > 0 ? 'bg-blue-50 border-blue-300 text-blue-700' : 'bg-white border-gray-300'
+        className={`w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+          selectedItems.length > 0
+            ? 'bg-gray-900 text-white'
+            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
         }`}
       >
-        <Icon className="w-4 h-4" />
-        <span className="text-sm">{title}</span>
-        {selectedItems.length > 0 && (
-          <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded-full">
-            {selectedItems.length}
-          </span>
-        )}
-        <ChevronDown className="w-4 h-4" />
+        <div className="flex items-center gap-2">
+          <Icon className="w-4 h-4" />
+          <span>{title}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          {selectedItems.length > 0 && (
+            <span className="bg-white text-gray-900 text-xs w-5 h-5 flex items-center justify-center rounded-full font-semibold">
+              {selectedItems.length}
+            </span>
+          )}
+          <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${showDropdowns[filterType] ? 'rotate-180' : ''}`} />
+        </div>
       </button>
 
       {showDropdowns[filterType] && (
-        <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 min-w-48 max-h-64 overflow-y-auto">
-          <div className="p-2">
-            {items.map((item) => (
-              <label
-                key={item}
-                className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded cursor-pointer"
-              >
-                <input
-                  type="checkbox"
-                  checked={selectedItems.includes(item)}
-                  onChange={() => toggleFilter(filterType, item)}
-                  className="text-blue-600"
-                />
-                <span className="text-sm">{item}</span>
-              </label>
-            ))}
+        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden">
+          <div className="p-2 max-h-48 overflow-y-auto">
+            {items.map((item) => {
+              const isSelected = selectedItems.includes(item);
+              return (
+                <button
+                  key={item}
+                  onClick={() => toggleFilter(filterType, item)}
+                  className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${
+                    isSelected
+                      ? 'bg-gray-900 text-white'
+                      : 'text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  <span className="truncate">{item}</span>
+                  {isSelected && <Check className="w-4 h-4 flex-shrink-0" />}
+                </button>
+              );
+            })}
           </div>
         </div>
       )}
     </div>
   );
 
-  return (
-    <div className="bg-white rounded-lg shadow-md border p-4 mb-6">
-      <div className="flex flex-col gap-4">
-        {/* Main Search Bar */}
-        <div className="flex gap-3 items-center">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input
-              ref={searchInputRef}
-              type="text"
-              placeholder="Search employees by name, title, department, email, location, or skills..."
-              value={searchQuery}
-              onChange={handleSearchChange}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 hover:bg-gray-100 rounded-full"
-              >
-                <X className="w-4 h-4 text-gray-400" />
-              </button>
-            )}
+  // Collapsed sidebar
+  if (isCollapsed) {
+    return (
+      <div className="h-full w-14 bg-white border-r border-gray-200 flex flex-col items-center py-4 gap-4">
+        <button
+          onClick={() => setIsCollapsed(false)}
+          className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
+          title="Expand sidebar"
+        >
+          <PanelLeft className="w-5 h-5 text-gray-600" />
+        </button>
+        <button
+          onClick={() => {
+            setIsCollapsed(false);
+            setTimeout(() => searchInputRef.current?.focus(), 100);
+          }}
+          className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
+          title="Search"
+        >
+          <Search className="w-5 h-5 text-gray-600" />
+        </button>
+        <button
+          onClick={() => {
+            setIsCollapsed(false);
+            setShowFilters(true);
+          }}
+          className={`p-2 rounded-xl transition-colors relative ${
+            getActiveFilterCount() > 0 ? 'bg-gray-900 text-white' : 'hover:bg-gray-100 text-gray-600'
+          }`}
+          title="Filters"
+        >
+          <SlidersHorizontal className="w-5 h-5" />
+          {getActiveFilterCount() > 0 && (
+            <span className="absolute -top-1 -right-1 w-4 h-4 bg-amber-500 text-white text-xs rounded-full flex items-center justify-center">
+              {getActiveFilterCount()}
+            </span>
+          )}
+        </button>
+        {isSearchActive && (
+          <div className="p-2 bg-gray-100 rounded-xl">
+            <span className="text-xs font-semibold text-gray-900">{searchResults.length}</span>
           </div>
-          
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-full w-80 bg-white border-r border-gray-200 flex flex-col shadow-xl">
+      {/* Header */}
+      <div className="p-4 border-b border-gray-100">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-gray-900">Search</h2>
           <button
-            onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-            className={`flex items-center gap-2 px-4 py-3 border rounded-lg transition-colors ${
-              showAdvancedFilters || getActiveFilterCount() > 0
-                ? 'bg-blue-600 text-white border-blue-600'
-                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-            }`}
+            onClick={() => setIsCollapsed(true)}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            title="Collapse sidebar"
           >
-            <Filter className="w-4 h-4" />
-            <span className="text-sm">Filters</span>
-            {getActiveFilterCount() > 0 && (
-              <span className="bg-white text-blue-600 text-xs px-2 py-1 rounded-full font-semibold">
-                {getActiveFilterCount()}
-              </span>
-            )}
+            <PanelLeftClose className="w-5 h-5 text-gray-500" />
           </button>
         </div>
 
-        {/* Advanced Filters */}
-        {showAdvancedFilters && (
-          <div className="border-t pt-4 animate-fade-in">
-            <div className="flex flex-wrap gap-3 mb-4">
-              <FilterDropdown
-                title="Department"
-                items={departments}
-                selectedItems={selectedFilters.departments}
-                filterType="departments"
-                icon={Users}
-              />
-              <FilterDropdown
-                title="Location"
-                items={locations}
-                selectedItems={selectedFilters.locations}
-                filterType="locations"
-                icon={MapPin}
-              />
-              <FilterDropdown
-                title="Skills"
-                items={skills}
-                selectedItems={selectedFilters.skills}
-                filterType="skills"
-                icon={Award}
-              />
-            </div>
-            
-            {/* Active Filters Display */}
+        {/* Search Input */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <input
+            ref={searchInputRef}
+            type="text"
+            placeholder="Search employees..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+            className="w-full pl-10 pr-10 py-2.5 bg-gray-50 border-0 rounded-xl text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:bg-white transition-all duration-200"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 hover:bg-gray-200 rounded-md transition-colors"
+            >
+              <X className="w-3.5 h-3.5 text-gray-500" />
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Filters Section */}
+      <div className="p-4 border-b border-gray-100">
+        <button
+          onClick={() => setShowFilters(!showFilters)}
+          className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+            showFilters || getActiveFilterCount() > 0
+              ? 'bg-gray-900 text-white'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+          }`}
+        >
+          <div className="flex items-center gap-2">
+            <SlidersHorizontal className="w-4 h-4" />
+            <span>Filters</span>
+          </div>
+          {getActiveFilterCount() > 0 && (
+            <span className={`text-xs w-5 h-5 flex items-center justify-center rounded-full font-semibold ${
+              showFilters || getActiveFilterCount() > 0
+                ? 'bg-white text-gray-900'
+                : 'bg-gray-900 text-white'
+            }`}>
+              {getActiveFilterCount()}
+            </span>
+          )}
+        </button>
+
+        {showFilters && (
+          <div className="mt-3 space-y-2">
+            <FilterDropdown
+              title="Department"
+              items={departments}
+              selectedItems={selectedFilters.departments}
+              filterType="departments"
+              icon={Building2}
+            />
+            <FilterDropdown
+              title="Location"
+              items={locations}
+              selectedItems={selectedFilters.locations}
+              filterType="locations"
+              icon={MapPin}
+            />
+            <FilterDropdown
+              title="Skills"
+              items={skills}
+              selectedItems={selectedFilters.skills}
+              filterType="skills"
+              icon={Sparkles}
+            />
+
             {getActiveFilterCount() > 0 && (
-              <div className="flex flex-wrap gap-2 mb-3">
-                <span className="text-sm text-gray-600">Active filters:</span>
-                
-                {selectedFilters.departments.map(dept => (
-                  <span
-                    key={dept}
-                    className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
-                  >
-                    <Users className="w-3 h-3" />
-                    {dept}
-                    <button
-                      onClick={() => toggleFilter('departments', dept)}
-                      className="hover:bg-blue-200 rounded-full p-0.5"
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
-                  </span>
-                ))}
-                
-                {selectedFilters.locations.map(location => (
-                  <span
-                    key={location}
-                    className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full"
-                  >
-                    <MapPin className="w-3 h-3" />
-                    {location}
-                    <button
-                      onClick={() => toggleFilter('locations', location)}
-                      className="hover:bg-green-200 rounded-full p-0.5"
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
-                  </span>
-                ))}
-                
-                {selectedFilters.skills.map(skill => (
-                  <span
-                    key={skill}
-                    className="inline-flex items-center gap-1 px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full"
-                  >
-                    <Award className="w-3 h-3" />
-                    {skill}
-                    <button
-                      onClick={() => toggleFilter('skills', skill)}
-                      className="hover:bg-purple-200 rounded-full p-0.5"
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
-                  </span>
-                ))}
-              </div>
+              <button
+                onClick={clearAll}
+                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 text-sm text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-xl transition-colors"
+              >
+                <X className="w-4 h-4" />
+                Clear all filters
+              </button>
             )}
           </div>
         )}
 
-        {/* Search Results Summary */}
-        {isSearchActive && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Zap className="w-4 h-4 text-blue-600" />
-                <span className="text-sm text-blue-800">
-                  Found {searchResults.length} employee{searchResults.length !== 1 ? 's' : ''} 
-                  {searchQuery && ` matching "${searchQuery}"`}
-                  {getActiveFilterCount() > 0 && ` with ${getActiveFilterCount()} filter${getActiveFilterCount() !== 1 ? 's' : ''}`}
-                </span>
-              </div>
-              <button
-                onClick={clearAll}
-                className="flex items-center gap-1 px-3 py-1 text-sm text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
+        {/* Active Filter Tags */}
+        {getActiveFilterCount() > 0 && !showFilters && (
+          <div className="mt-3 flex flex-wrap gap-1.5">
+            {selectedFilters.departments.map(dept => (
+              <span
+                key={dept}
+                className="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full"
               >
-                <X className="w-4 h-4" />
-                Clear All
-              </button>
-            </div>
+                {dept}
+                <button onClick={() => toggleFilter('departments', dept)}>
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            ))}
+            {selectedFilters.locations.map(loc => (
+              <span
+                key={loc}
+                className="inline-flex items-center gap-1 px-2 py-1 bg-emerald-50 text-emerald-700 text-xs font-medium rounded-full"
+              >
+                {loc}
+                <button onClick={() => toggleFilter('locations', loc)}>
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            ))}
+            {selectedFilters.skills.map(skill => (
+              <span
+                key={skill}
+                className="inline-flex items-center gap-1 px-2 py-1 bg-violet-50 text-violet-700 text-xs font-medium rounded-full"
+              >
+                {skill}
+                <button onClick={() => toggleFilter('skills', skill)}>
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            ))}
           </div>
         )}
+      </div>
+
+      {/* Results Section */}
+      <div className="flex-1 overflow-hidden flex flex-col">
+        {/* Results Header */}
+        <div className="px-4 py-3 bg-gray-50 border-b border-gray-100">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-gray-900">
+              {isSearchActive ? `${searchResults.length} results` : `${employees.length} employees`}
+            </span>
+            {isSearchActive && (
+              <button
+                onClick={clearAll}
+                className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Results List */}
+        <div className="flex-1 overflow-y-auto">
+          {(isSearchActive ? searchResults : employees).map((employee) => (
+            <div
+              key={employee.id}
+              className="px-4 py-3 border-b border-gray-50 hover:bg-gray-50 cursor-pointer transition-colors group"
+              onClick={() => onEmployeeClick && onEmployeeClick(employee)}
+            >
+              <div className="flex items-center gap-3">
+                {/* Avatar */}
+                <div className="flex-shrink-0">
+                  {employee.avatar ? (
+                    <img
+                      src={employee.avatar}
+                      alt={employee.name}
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 bg-gradient-to-br from-gray-700 to-gray-900 rounded-full flex items-center justify-center text-white font-medium text-xs">
+                      {getInitials(employee.name)}
+                    </div>
+                  )}
+                </div>
+
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900 truncate">
+                    {employee.name}
+                  </p>
+                  <p className="text-xs text-gray-500 truncate">
+                    {employee.title}
+                  </p>
+                  <span className={`inline-block mt-1 px-2 py-0.5 rounded text-xs font-medium ${getDepartmentColor(employee.department)}`}>
+                    {employee.department}
+                  </span>
+                </div>
+
+                {/* Navigate Button */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onNavigateToEmployee && onNavigateToEmployee(employee.id);
+                  }}
+                  className="p-2 opacity-0 group-hover:opacity-100 hover:bg-gray-200 rounded-lg transition-all"
+                  title="Navigate to employee"
+                >
+                  <ChevronRight className="w-4 h-4 text-gray-400" />
+                </button>
+              </div>
+            </div>
+          ))}
+
+          {isSearchActive && searchResults.length === 0 && (
+            <div className="p-8 text-center">
+              <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Search className="w-6 h-6 text-gray-400" />
+              </div>
+              <p className="text-sm font-medium text-gray-900 mb-1">No results found</p>
+              <p className="text-xs text-gray-500">Try adjusting your search or filters</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

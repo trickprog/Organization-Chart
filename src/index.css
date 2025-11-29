@@ -14,7 +14,6 @@
   }
 
   .org-chart-container {
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
     min-height: 100vh;
   }
 
@@ -94,5 +93,360 @@
       max-height: 500px;
       transform: translateY(0);
     }
+  }
+
+  /* Premium Employee Card Styles */
+  .employee-card-premium {
+    @apply relative overflow-hidden;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 20px;
+    box-shadow:
+      0 4px 24px -1px rgba(0, 0, 0, 0.06),
+      0 2px 8px -1px rgba(0, 0, 0, 0.04);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .employee-card-premium::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #6366f1, #8b5cf6, #a855f7);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .employee-card-premium:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow:
+      0 20px 40px -5px rgba(0, 0, 0, 0.1),
+      0 10px 20px -5px rgba(0, 0, 0, 0.06);
+    border-color: rgba(99, 102, 241, 0.2);
+  }
+
+  .employee-card-premium:hover::before {
+    opacity: 1;
+  }
+
+  /* Card enter animation */
+  .card-enter {
+    animation: cardEnter 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  @keyframes cardEnter {
+    from {
+      opacity: 0;
+      transform: translateY(20px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  /* Avatar styles */
+  .avatar-premium {
+    @apply relative;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .avatar-premium::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .employee-card-premium:hover .avatar-premium::after {
+    opacity: 1;
+  }
+
+  .employee-card-premium:hover .avatar-premium {
+    transform: scale(1.05);
+  }
+
+  /* Premium button styles */
+  .btn-premium {
+    @apply relative overflow-hidden px-4 py-2 rounded-xl font-medium text-sm;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+  }
+
+  .btn-premium::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s ease, height 0.6s ease;
+  }
+
+  .btn-premium:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 4px 16px rgba(99, 102, 241, 0.4),
+      0 0 20px rgba(139, 92, 246, 0.2);
+  }
+
+  .btn-premium:hover::before {
+    width: 300px;
+    height: 300px;
+  }
+
+  .btn-premium:active {
+    transform: translateY(0);
+  }
+
+  /* Department badge styles */
+  .badge-premium {
+    @apply px-3 py-1 rounded-full text-xs font-semibold;
+    backdrop-filter: blur(8px);
+    transition: all 0.3s ease;
+  }
+
+  .badge-executive {
+    background: rgba(59, 130, 246, 0.15);
+    color: #2563eb;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+  }
+
+  .badge-technology {
+    background: rgba(16, 185, 129, 0.15);
+    color: #059669;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+  }
+
+  .badge-hr {
+    background: rgba(139, 92, 246, 0.15);
+    color: #7c3aed;
+    border: 1px solid rgba(139, 92, 246, 0.2);
+  }
+
+  .badge-finance {
+    background: rgba(245, 158, 11, 0.15);
+    color: #d97706;
+    border: 1px solid rgba(245, 158, 11, 0.2);
+  }
+
+  .badge-marketing {
+    background: rgba(239, 68, 68, 0.15);
+    color: #dc2626;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+  }
+
+  .badge-sales {
+    background: rgba(6, 182, 212, 0.15);
+    color: #0891b2;
+    border: 1px solid rgba(6, 182, 212, 0.2);
+  }
+
+  /* Info row hover effect */
+  .info-row {
+    @apply flex items-center gap-2 p-2 rounded-lg transition-all duration-300;
+  }
+
+  .info-row:hover {
+    background: rgba(99, 102, 241, 0.05);
+  }
+
+  /* Premium Modal Styles */
+  .modal-premium-overlay {
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .modal-premium {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 24px;
+    box-shadow:
+      0 25px 50px -12px rgba(0, 0, 0, 0.25),
+      0 0 0 1px rgba(255, 255, 255, 0.1);
+    animation: modalEnter 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  @keyframes modalEnter {
+    from {
+      opacity: 0;
+      transform: scale(0.95) translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  /* Close button */
+  .close-btn-premium {
+    @apply p-2 rounded-xl transition-all duration-300;
+    background: rgba(241, 245, 249, 0.8);
+  }
+
+  .close-btn-premium:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    transform: rotate(90deg);
+  }
+
+  /* Skill tag animation */
+  .skill-tag {
+    @apply px-3 py-1.5 rounded-full text-sm font-medium;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+    color: #6366f1;
+    border: 1px solid rgba(99, 102, 241, 0.15);
+    transition: all 0.3s ease;
+  }
+
+  .skill-tag:hover {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2));
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+  }
+
+  /* Subordinate card in modal */
+  .subordinate-card {
+    @apply p-3 rounded-xl transition-all duration-300;
+    background: rgba(248, 250, 252, 0.8);
+    border: 1px solid rgba(226, 232, 240, 0.5);
+  }
+
+  .subordinate-card:hover {
+    background: rgba(255, 255, 255, 1);
+    border-color: rgba(99, 102, 241, 0.2);
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+
+  /* Pulse animation for online status */
+  .status-online {
+    @apply relative;
+  }
+
+  .status-online::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 12px;
+    height: 12px;
+    background: #10b981;
+    border: 2px solid white;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+    }
+    50% {
+      box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+    }
+  }
+
+  /* Shimmer effect for loading states */
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.5) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  /* Dimmed state for non-highlighted nodes */
+  .org-node-dimmed {
+    opacity: 0.35;
+    filter: grayscale(40%);
+    transition: all 0.3s ease;
+  }
+
+  .org-node-dimmed:hover {
+    opacity: 0.6;
+    filter: grayscale(10%);
+  }
+
+  /* When selection is active, dim ALL default tree lines */
+  .org-chart-has-selection ul::before {
+    border-left-color: #e5e7eb !important;
+    opacity: 0.4;
+  }
+
+  .org-chart-has-selection li::before,
+  .org-chart-has-selection li::after {
+    border-color: #e5e7eb !important;
+    opacity: 0.4;
+  }
+
+  /* Highlighted path node wrapper - just for identification */
+  .highlighted-path-node {
+    position: relative;
+    z-index: 10;
+  }
+
+  /* Custom overlay path highlight lines - drawn over the dimmed default lines */
+  .path-highlight-line {
+    position: absolute;
+    background: linear-gradient(135deg, #f59e0b, #fbbf24);
+    border-radius: 3px;
+    z-index: 5;
+    pointer-events: none;
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.5), 0 0 4px rgba(245, 158, 11, 0.8);
+  }
+
+  /* Ensure employee cards are above overlay lines */
+  .highlighted-path-node > div,
+  .org-node-dimmed > div {
+    position: relative;
+    z-index: 10;
+  }
+
+  /* Canvas container styles */
+  .org-chart-canvas {
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .org-chart-canvas-inner {
+    will-change: transform;
+  }
+
+  /* Prevent overflow and scrollbars */
+  .org-chart-container {
+    overflow: visible;
+  }
+
+  /* Main content area - prevent horizontal scroll */
+  .App {
+    overflow-x: hidden;
   }
 }
