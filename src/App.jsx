@@ -1,7 +1,5 @@
 import React, { useState, useRef } from "react";
-import { ProfessionalOrgChart } from "./components/ProfessionalOrgChart";
-import { EmployeeDetailModal } from "./components/EmployeeCard";
-import { SearchFilter } from "./components/SearchFilter";
+import { ProfessionalOrgChart, EmployeeDetailModal, SearchFilter } from "./components";
 import { mockEmployees } from "./data/mockData";
 import "./index.css";
 
@@ -32,7 +30,6 @@ function App() {
   };
 
   const handleNavigateToEmployee = (employeeId) => {
-    // This will be handled by the org chart component
     if (orgChartRef.current && orgChartRef.current.navigateToEmployee) {
       orgChartRef.current.navigateToEmployee(employeeId);
     }
