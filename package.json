@@ -1,18 +1,57 @@
 {
-  "name": "hr-org-chart-clean",
-  "private": true,
-  "version": "0.0.0",
+  "name": "react-hr-org-chart",
+  "version": "1.0.0",
+  "description": "A modern, interactive HR Organization Chart component for React with search, filtering, path highlighting, and pan navigation",
   "type": "module",
+  "main": "./dist/react-hr-org-chart.umd.cjs",
+  "module": "./dist/react-hr-org-chart.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/react-hr-org-chart.js",
+      "require": "./dist/react-hr-org-chart.umd.cjs"
+    },
+    "./styles": "./dist/style.css"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:lib": "vite build --config vite.lib.config.js",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "prepublishOnly": "npm run build:lib"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/react-hr-org-chart.git"
+  },
+  "keywords": [
+    "react",
+    "organization-chart",
+    "org-chart",
+    "hr",
+    "employee",
+    "hierarchy",
+    "tree",
+    "component",
+    "tailwindcss"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/yourusername/react-hr-org-chart/issues"
+  },
+  "homepage": "https://github.com/yourusername/react-hr-org-chart#readme",
+  "peerDependencies": {
+    "react": ">=17.0.0",
+    "react-dom": ">=17.0.0"
   },
   "dependencies": {
     "lucide-react": "^0.263.1",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
     "react-organizational-chart": "^2.2.1"
   },
   "devDependencies": {
@@ -22,7 +61,10 @@
     "autoprefixer": "^10.4.14",
     "eslint": "^8.45.0",
     "postcss": "^8.4.27",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "tailwindcss": "^3.3.3",
-    "vite": "^4.4.5"
+    "vite": "^4.4.5",
+    "vite-plugin-dts": "^3.9.1"
   }
 }
